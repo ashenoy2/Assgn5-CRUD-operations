@@ -6,19 +6,11 @@ from ..models import models, schemas
     # id, sandwich_name, price, recipes
 
 #CREATE
-def create(db: Session, sandwich):
-    # Create a new instance of the sandwich model with the provided data
-    db_sandwich = models.Sandwich(
-        sandwich_name=sandwich.sandwich_name,
-        price=sandwich.price
-    )
-    # Add the newly created sandwich object to the database session
+def create(db: Session, sandwich: schemas.SandwichCreate):
+    db_sandwich = models.Sandwich(**sandwich.model_dump())
     db.add(db_sandwich)
-    # Commit the changes to the database
     db.commit()
-    # Refresh the sandwich object to ensure it reflects the current state in the database
     db.refresh(db_sandwich)
-    # Return the newly created sandwich object
     return db_sandwich
 
 #UPDATE
@@ -26,7 +18,7 @@ def update(db: Session, sandwich_id, sandwich):
     # Query the database for the specific sandwich to update
     db_sandwich = db.query(models.Sandwich).filter(models.Sandwich.id == sandwich_id)
     # Extract the update data from the provided 'sandwich' object
-    update_data = sandwich.model_dump(exclude_unset=True)
+    update_data = sandwich.dict(exclude_unset=True)
     # Update the database record with the new data, without synchronizing the session
     db_sandwich.update(update_data, synchronize_session=False)
     # Commit the changes to the database

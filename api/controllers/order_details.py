@@ -7,40 +7,42 @@ from ..models import models, schemas
 
 #CREATE
 def create(db: Session, order_details):
-    # Create a new instance of the sandwich model with the provided data
-    db_sandwich = models.Sandwich(
-        order_id
-        sandwich_id=order_details.sandwich_name,
-        price=order_details.price
+    # Create a new instance of the order_details model with the provided data
+    db_order_details = models.OrderDetail(
+        amount=order_details.amount,
+        order_id=order_details.order_id,
+        sandwich_id=order_details.sandwich_id
+
     )
-    # Add the newly created sandwich object to the database session
-    db.add(db_sandwich)
+    # Add the newly created order details object to the database session
+    db.add(db_order_details)
     # Commit the changes to the database
     db.commit()
-    # Refresh the sandwich object to ensure it reflects the current state in the database
-    db.refresh(db_sandwich)
-    # Return the newly created sandwich object
-    return db_sandwich
+    # Refresh the order_details object to ensure it reflects the current state in the database
+    db.refresh(db_order_details)
+    # Return the newly created order_details object
+    return db_order_details
 
 #UPDATE
-def update(db: Session, sandwich_id, sandwich):
-    # Query the database for the specific sandwich to update
-    db_sandwich = db.query(models.Sandwich).filter(models.Sandwich.id == sandwich_id)
-    # Extract the update data from the provided 'sandwich' object
-    update_data = sandwich.model_dump(exclude_unset=True)
+def update(db: Session, order_details, order_detail_id):
+    # Query the database for the specific order to update -----> here we compare the primary key of order_details
+    # with OrderDetail
+    db_order_details = db.query(models.OrderDetail).filter(models.OrderDetail.id == order_detail_id)
+    # Extract the update data from the provided 'order_details' object
+    update_data = order_details.model_dump(exclude_unset=True)
     # Update the database record with the new data, without synchronizing the session
-    db_sandwich.update(update_data, synchronize_session=False)
+    db_order_details.update(update_data, synchronize_session=False)
     # Commit the changes to the database
     db.commit()
-    # Return the updated sandwich record
-    return db_sandwich.first()
+    # Return the updated order details record
+    return db_order_details.first()
 
 #DELETE
-def delete(db: Session, sandwich_id):
-    #Query the database for the specific sandwich to delete
-    db_sandwich = db.query(models.Sandwich).filter(models.Sandwich.id == sandwich_id)
+def delete(db: Session, order_detail_id):
+    #Query the database for the order_details to delete
+    db_order_details = db.query(models.OrderDetail).filter(models.OrderDetail.id == order_detail_id)
     # Delete the database record without synchronizing the session
-    db_sandwich.delete(synchronize_session=False)
+    db_order_details.delete(synchronize_session=False)
     # Commit the changes to the database
     db.commit()
     # Return a response with a status code indicating success (204 No Content)
@@ -48,8 +50,8 @@ def delete(db: Session, sandwich_id):
 
 #READ ALL
 def read_all(db: Session):
-    return db.query(models.Sandwich).all()
+    return db.query(models.OrderDetail).all()
 
 #READ ONE
-def read_one(db: Session, sandwich_id):
-    return db.query(models.Sandwich).filter(models.Sandwich.id == sandwich_id).first()
+def read_one(db: Session, order_details, ):
+    return db.query(models.OrderDetail).filter(models.OrderDetail.id == order_details).first()
